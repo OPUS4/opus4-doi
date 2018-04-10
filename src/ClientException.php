@@ -26,23 +26,13 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Application
- * @author      Jens Schwidder <schwidder@zib.de>
- * @copyright   Copyright (c) 2017, OPUS 4 development team
+ * @author      Sascha Szott <szott@zib.de>
+ * @copyright   Copyright (c) 2018, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Doi;
+namespace Opus\Doi;
 
-use Opus\Doi\Example;
-use PHPUnit\Framework\TestCase;
+class ClientException extends \Exception {
 
-class ExampleTest extends TestCase
-{
-
-    public function testGetName()
-    {
-        $example = new Example();
-
-        $this->assertEquals('Example', $example->getName());
-    }
 }
