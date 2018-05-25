@@ -134,7 +134,7 @@ class ClientTest extends TestCase {
         $this->assertNull($exception);
     }
 
-    public function testRegisterDOI() {
+    public function testRegisterDoi() {
         $config = new \Zend_Config(
             array('doi' =>
                 array('registration' =>
@@ -146,10 +146,10 @@ class ClientTest extends TestCase {
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
-        $client->registerDOI('10.5072/opustest-999', '', 'http://localhost/opus4/frontdoor/index/index/999');
+        $client->registerDoi('10.5072/opustest-999', '', 'http://localhost/opus4/frontdoor/index/index/999');
     }
 
-    public function testRegisterDOIWithDataCiteTestAccount() {
+    public function testRegisterDoiWithDataCiteTestAccount() {
 
         $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
 
@@ -182,10 +182,10 @@ class ClientTest extends TestCase {
 <dates><date dateType="Created">2018-03-25</date></dates>
 </resource>';
 
-        $client->registerDOI('10.5072/opustest-999', $xmlStr, 'http://localhost/opus4/frontdoor/index/index/999');
+        $client->registerDoi('10.5072/opustest-999', $xmlStr, 'http://localhost/opus4/frontdoor/index/index/999');
     }
 
-    public function testCheckDOI() {
+    public function testCheckDoi() {
         $config = new \Zend_Config(
             array('doi' =>
                 array('registration' =>
@@ -197,11 +197,11 @@ class ClientTest extends TestCase {
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
-        $result = $client->checkDOI('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/99');
+        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/99');
         $this->assertFalse($result);
     }
 
-    public function testCheckDOIWithDataCiteTestAccount() {
+    public function testCheckDoiWithDataCiteTestAccount() {
 
         $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
 
@@ -215,14 +215,14 @@ class ClientTest extends TestCase {
                             'serviceUrl' => 'https://mds.test.datacite.org')))));
 
         $client = new Client($config);
-        $result = $client->checkDOI('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/999');
+        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/999');
         $this->assertTrue($result);
 
-        $result = $client->checkDOI('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/111');
+        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/111');
         $this->assertFalse($result);
     }
 
-    public function testUpdateURLforDOI() {
+    public function testUpdateUrlForDoi() {
         $config = new \Zend_Config(
             array('doi' =>
                 array('registration' =>
@@ -234,10 +234,10 @@ class ClientTest extends TestCase {
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
-        $client->updateURLforDOI('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
+        $client->updateUrlForDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
     }
 
-    public function testUpdateURLforDOIWithDataCiteTestAccount() {
+    public function testUpdateUrlForDoiWithDataCiteTestAccount() {
 
         $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
 
@@ -251,8 +251,8 @@ class ClientTest extends TestCase {
                             'serviceUrl' => 'https://mds.test.datacite.org')))));
 
         $client = new Client($config);
-        $client->updateURLforDOI('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
-        $result = $client->checkDOI('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
+        $client->updateUrlForDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
+        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
         $this->assertTrue($result);
     }
 

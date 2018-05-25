@@ -83,7 +83,7 @@ class Client {
      *
      * @throws ClientException
      */
-    public function registerDOI($doiValue, $xmlStr, $landingPageUrl) {
+    public function registerDoi($doiValue, $xmlStr, $landingPageUrl) {
 
         // Schritt 1: Metadaten als XML registrieren
         $response = null;
@@ -171,7 +171,7 @@ class Client {
      * @throws ClientException
      *
      */
-    public function checkDOI($doiValue, $landingPageURL) {
+    public function checkDoi($doiValue, $landingPageURL) {
         $response = null;
         $url = $this->serviceUrl . '/doi/' . $doiValue;
         try {
@@ -210,7 +210,7 @@ class Client {
      * @throws ClientException
      *
      */
-    public function updateURLforDOI($doiValue, $newUrl) {
+    public function updateUrlForDoi($doiValue, $newUrl) {
         $response = null;
         $url = $this->serviceUrl . '/doi/' . $doiValue;
         try {
