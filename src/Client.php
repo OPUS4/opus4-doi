@@ -27,13 +27,14 @@
  *
  * @category    Application
  * @author      Sascha Szott <szott@zib.de>
- * @copyright   Copyright (c) 2018, OPUS 4 development team
+ * @copyright   Copyright (c) 2018-2019, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Doi;
 
-class Client {
+class Client
+{
 
     private $username;
 
@@ -51,18 +52,22 @@ class Client {
      *
      * @throws ClientException
      */
-    public function __construct($config, $log = null) {
-        if (isset($config->doi->registration->datacite->username) && $config->doi->registration->datacite->username != '') {
+    public function __construct($config, $log = null)
+    {
+        if (isset($config->doi->registration->datacite->username)
+            && $config->doi->registration->datacite->username != '') {
             $this->username = $config->doi->registration->datacite->username;
         }
-        if (isset($config->doi->registration->datacite->password) && $config->doi->registration->datacite->password != '') {
+        if (isset($config->doi->registration->datacite->password)
+            && $config->doi->registration->datacite->password != '') {
             $this->password = $config->doi->registration->datacite->password;
         }
-        if (isset($config->doi->registration->datacite->serviceUrl) && $config->doi->registration->datacite->serviceUrl != '') {
+        if (isset($config->doi->registration->datacite->serviceUrl)
+            && $config->doi->registration->datacite->serviceUrl != '') {
             $this->serviceUrl = $config->doi->registration->datacite->serviceUrl;
         }
 
-        if (!is_null($log)) {
+        if (! is_null($log)) {
             $this->log = $log;
         }
 
@@ -83,7 +88,8 @@ class Client {
      *
      * @throws ClientException
      */
-    public function registerDoi($doiValue, $xmlStr, $landingPageUrl) {
+    public function registerDoi($doiValue, $xmlStr, $landingPageUrl)
+    {
 
         // Schritt 1: Metadaten als XML registrieren
         $response = null;
@@ -94,8 +100,7 @@ class Client {
 
             $client->setRawData($xmlStr, 'application/xml;charset=UTF-8');
             $response = $client->request(\Zend_Http_Client::POST);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -126,8 +131,7 @@ class Client {
             $data = "doi=$doiValue\nurl=" . $landingPageUrl;
             $client->setRawData($data, 'text/plain;charset=UTF-8');
             $response = $client->request(\Zend_Http_Client::PUT);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -158,7 +162,8 @@ class Client {
      *
      * Response Status Codes
      * 200 OK: operation successful
-     * 204 No Content : DOI is known to DataCite Metadata Store (MDS), but is not minted (or not resolvable e.g. due to handle's latency)
+     * 204 No Content : DOI is known to DataCite Metadata Store (MDS), but is not minted (or not resolvable e.g. due
+     *     to handle's latency)
      * 401 Unauthorized: no login
      * 403 Login problem or dataset belongs to another party
      * 404 Not Found: DOI does not exist in our database (e.g. registration pending)
@@ -166,20 +171,20 @@ class Client {
      * @param $doiValue
      * @param $landingPageURL
      *
-     * @return bool Methode liefert true zurück, wenn die DOI erfolgreich registiert wurde und die Prüfung positiv ausfällt.
+     * @return bool Methode liefert true, wenn die DOI erfolgreich registiert wurde und die Prüfung positiv ausfällt.
      *
      * @throws ClientException
      *
      */
-    public function checkDoi($doiValue, $landingPageURL) {
+    public function checkDoi($doiValue, $landingPageURL)
+    {
         $response = null;
         $url = $this->serviceUrl . '/doi/' . $doiValue;
         try {
             $client = new \Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
             $response = $client->request(\Zend_Http_Client::GET);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -210,17 +215,18 @@ class Client {
      * @throws ClientException
      *
      */
-    public function updateUrlForDoi($doiValue, $newUrl) {
+    public function updateUrlForDoi($doiValue, $newUrl)
+    {
         $response = null;
         $url = $this->serviceUrl . '/doi/' . $doiValue;
+
         try {
             $client = new \Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
             $data = "doi=$doiValue\nurl=$newUrl";
             $client->setRawData($data, 'text/plain;charset=UTF-8');
             $response = $client->request(\Zend_Http_Client::PUT);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -243,15 +249,15 @@ class Client {
      *
      * @throws ClientException
      */
-    public function deleteMetadataForDoi($doiValue) {
+    public function deleteMetadataForDoi($doiValue)
+    {
         $response = null;
         $url = $this->serviceUrl . '/metadata/' . $doiValue;
         try {
             $client = new \Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
             $response = $client->request(\Zend_Http_Client::DELETE);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -266,11 +272,11 @@ class Client {
         }
     }
 
-    private function log($message, $level = 'debug') {
+    private function log($message, $level = 'debug')
+    {
         if (is_null($this->log)) {
             return; // do not log anything
         }
         $this->log->$level($message);
     }
-
 }

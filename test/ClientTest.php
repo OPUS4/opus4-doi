@@ -27,7 +27,7 @@
  *
  * @category    Application
  * @author      Sascha Szott <szott@zib.de>
- * @copyright   Copyright (c) 2018, OPUS 4 development team
+ * @copyright   Copyright (c) 2018-2019, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -37,134 +37,162 @@ use Opus\Doi\Client;
 use Opus\Doi\ClientException;
 use PHPUnit\Framework\TestCase;
 
-class ClientTest extends TestCase {
+class ClientTest extends TestCase
+{
 
-    const dataCiteUserName = 'test';
+    const DATACITE_USERNAME = 'test';
 
-    const dataCitePassword = 'secret';
+    const DATACITE_PASSWORD = 'secret';
 
-    const sampleIpAddress = '192.0.2.1';
+    const SAMPLE_IP_ADDRESS = '192.0.2.1';
 
-    public function testConstructorWithEmptyConfig() {
-        $config = new \Zend_Config(array());
+    public function testConstructorWithEmptyConfig()
+    {
+        $config = new \Zend_Config([]);
 
         $exception = null;
         try {
             new Client($config);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
     }
 
-    public function testConstructorWithPartialConfig1() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array('username' => 'doe')))));
+    public function testConstructorWithPartialConfig1()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe']
+                ]
+            ]
+        ]);
 
         $exception = null;
         try {
             new Client($config);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
     }
 
-    public function testConstructorWithPartialConfig2() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'password' => 'secret')))));
+    public function testConstructorWithPartialConfig2()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'password' => 'secret'
+                    ]
+                ]
+            ]
+        ]);
 
         $exception = null;
         try {
             new Client($config);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
     }
 
-    public function testConstructorWithPartialConfig3() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'serviceUrl' => 'http://' . self::sampleIpAddress)))));
+    public function testConstructorWithPartialConfig3()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
+                    ]
+                ]
+            ]
+        ]);
 
         $exception = null;
         try {
             new Client($config);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
     }
 
-    public function testConstructorWithFullConfig() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'password' => 'secret',
-                            'serviceUrl' => 'http://' . self::sampleIpAddress)))));
+    public function testConstructorWithFullConfig()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'password' => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
+                    ]
+                ]
+            ]
+        ]);
 
         $exception = null;
         try {
             new Client($config);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $exception = $e;
         }
 
         $this->assertNull($exception);
     }
 
-    public function testRegisterDoi() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'password' => 'secret',
-                            'serviceUrl' => 'http://' . self::sampleIpAddress)))));
+    public function testRegisterDoi()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'password' => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
-        $client->registerDoi('10.5072/opustest-999', '', 'http://localhost/opus4/frontdoor/index/index/999');
+        $client->registerDoi(
+            '10.5072/opustest-999',
+            '',
+            'http://localhost/opus4/frontdoor/index/index/999'
+        );
     }
 
-    public function testRegisterDoiWithDataCiteTestAccount() {
+    public function testRegisterDoiWithDataCiteTestAccount()
+    {
+        $this->markTestSkipped(
+            'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
+        );
 
-        $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
-
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => self::dataCiteUserName,
-                            'password' => self::dataCitePassword,
-                            'serviceUrl' => 'https://mds.test.datacite.org')))));
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => self::DATACITE_USERNAME,
+                        'password' => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org'
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
-        $xmlStr = '<?xml version="1.0" encoding="utf-8"?>
-<resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+        $xmlStr = <<<STRING
+<?xml version="1.0" encoding="utf-8"?>
+<resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 <identifier identifierType="DOI">10.5072/opustest-999</identifier>
 <creators>
 <creator>
@@ -180,109 +208,153 @@ class ClientTest extends TestCase {
 <publicationYear>2018</publicationYear>
 <resourceType resourceTypeGeneral="Text">Book</resourceType>
 <dates><date dateType="Created">2018-03-25</date></dates>
-</resource>';
+</resource>
+STRING;
 
-        $client->registerDoi('10.5072/opustest-999', $xmlStr, 'http://localhost/opus4/frontdoor/index/index/999');
+        $client->registerDoi(
+            '10.5072/opustest-999',
+            $xmlStr,
+            'http://localhost/opus4/frontdoor/index/index/999'
+        );
     }
 
-    public function testCheckDoi() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'password' => 'secret',
-                            'serviceUrl' => 'http://' . self::sampleIpAddress)))));
+    public function testCheckDoi()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'password' => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
-        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/99');
+        $result = $client->checkDoi(
+            '10.5072/opustest-999',
+            'http://localhost/opus4/frontdoor/index/index/99'
+        );
         $this->assertFalse($result);
     }
 
-    public function testCheckDoiWithDataCiteTestAccount() {
+    public function testCheckDoiWithDataCiteTestAccount()
+    {
+        $this->markTestSkipped(
+            'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
+        );
 
-        $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
-
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => self::dataCiteUserName,
-                            'password' => self::dataCitePassword,
-                            'serviceUrl' => 'https://mds.test.datacite.org')))));
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => self::DATACITE_USERNAME,
+                        'password' => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org'
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
-        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/999');
+        $result = $client->checkDoi(
+            '10.5072/opustest-999',
+            'http://localhost/opus4/frontdoor/index/index/999'
+        );
         $this->assertTrue($result);
 
-        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus4/frontdoor/index/index/111');
+        $result = $client->checkDoi(
+            '10.5072/opustest-999',
+            'http://localhost/opus4/frontdoor/index/index/111'
+        );
         $this->assertFalse($result);
     }
 
-    public function testUpdateUrlForDoi() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'password' => 'secret',
-                            'serviceUrl' => 'http://' . self::sampleIpAddress)))));
+    public function testUpdateUrlForDoi()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'password' => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
         $client->updateUrlForDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
     }
 
-    public function testUpdateUrlForDoiWithDataCiteTestAccount() {
+    public function testUpdateUrlForDoiWithDataCiteTestAccount()
+    {
+        $this->markTestSkipped(
+            'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
+        );
 
-        $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
-
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => self::dataCiteUserName,
-                            'password' => self::dataCitePassword,
-                            'serviceUrl' => 'https://mds.test.datacite.org')))));
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => self::DATACITE_USERNAME,
+                        'password' => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org'
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
         $client->updateUrlForDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
-        $result = $client->checkDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
+        $result = $client->checkDoi(
+            '10.5072/opustest-999',
+            'http://localhost/opus5/frontdoor/index/index/999'
+        );
         $this->assertTrue($result);
     }
 
-    public function testDeleteMetadataForDoi() {
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => 'doe',
-                            'password' => 'secret',
-                            'serviceUrl' => 'http://' . self::sampleIpAddress)))));
+    public function testDeleteMetadataForDoi()
+    {
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => 'doe',
+                        'password' => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
         $this->setExpectedException('Opus\Doi\ClientException');
         $client->deleteMetadataForDoi('10.5072/opustest-999');
     }
 
-    public function testDeleteMetadataForDoiWithDataCiteTestAccount() {
+    public function testDeleteMetadataForDoiWithDataCiteTestAccount()
+    {
+        $this->markTestSkipped(
+            'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
+        );
 
-        $this->markTestSkipped('Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)');
-
-        $config = new \Zend_Config(
-            array('doi' =>
-                array('registration' =>
-                    array('datacite' =>
-                        array(
-                            'username' => self::dataCiteUserName,
-                            'password' => self::dataCitePassword,
-                            'serviceUrl' => 'https://mds.test.datacite.org')))));
+        $config = new \Zend_Config([
+            'doi' => [
+                'registration' => [
+                    'datacite' => [
+                        'username' => self::DATACITE_USERNAME,
+                        'password' => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org'
+                    ]
+                ]
+            ]
+        ]);
 
         $client = new Client($config);
         $client->deleteMetadataForDoi('10.5072/opustest-999');
