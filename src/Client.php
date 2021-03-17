@@ -27,11 +27,17 @@
  *
  * @category    Application
  * @author      Sascha Szott <szott@zib.de>
- * @copyright   Copyright (c) 2018-2019, OPUS 4 development team
+ * @author      Jens Schwidder <schwidder@zib.de>
+ * @copyright   Copyright (c) 2018-2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Doi;
+
+use Laminas\Config\Config;
+use Laminas\Http\Request;
+use Laminas\Log\Logger;
+use Laminas\Http\Client as HttpClient;
 
 class Client
 {
@@ -47,8 +53,8 @@ class Client
     /**
      * Client constructor.
      *
-     * @param $config \Zend_Config
-     * @param $log \Zend_Log (optional)
+     * @param Config $config
+     * @param Logger $log (optional)
      *
      * @throws ClientException
      */
@@ -95,18 +101,21 @@ class Client
         $response = null;
         $url = $this->serviceUrl . '/metadata';
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new HttpClient($url);
             $client->setAuth($this->username, $this->password);
-
-            $client->setRawData($xmlStr, 'application/xml;charset=UTF-8');
-            $response = $client->request(\Zend_Http_Client::POST);
+            $client->setRawBody($xmlStr);
+            $client->setMethod(Request::METHOD_POST);
+            $client->getRequest()->getHeaders()->addHeaders([
+                'Content-Type' => 'application/xml;charset=UTF-8'
+            ]);
+            $response = $client->send();
         } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
 
-        $this->log('DataCite response status code (expected 201): ' . $response->getStatus());
+        $this->log('DataCite response status code (expected 201): ' . $response->getStatusCode());
         $this->log('DataCite response body: ' . $response->getBody());
 
         // Response Codes
@@ -116,8 +125,8 @@ class Client
         // 403 Forbidden: login problem, quota exceeded
         // 415 Wrong Content Type : Not including content type in the header.
 
-        if ($response->getStatus() != 201) {
-            $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
+        if ($response->getStatusCode() != 201) {
+            $message = 'unexpected DataCite MDS response code ' . $response->getStatusCode();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
@@ -126,11 +135,15 @@ class Client
         // DOI und URL der Frontdoor des zugehörigen Dokuments übergeben
         $url = $this->serviceUrl . '/doi/' . $doiValue;
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new HttpClient($url);
             $client->setAuth($this->username, $this->password);
             $data = "doi=$doiValue\nurl=" . $landingPageUrl;
-            $client->setRawData($data, 'text/plain;charset=UTF-8');
-            $response = $client->request(\Zend_Http_Client::PUT);
+            $client->setRawBody($data);
+            $client->getRequest()->getHeaders()->addHeaders([
+                'Content-Type' => 'text/plain;charset=UTF-8'
+            ]);
+            $client->setMethod(Request::METHOD_PUT);
+            $response = $client->send();
         } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
@@ -144,11 +157,11 @@ class Client
         // 403 Forbidden: login problem, quota exceeded
         // 412 Precondition failed: metadata must be uploaded first.
 
-        $this->log('DataCite response status code (expected 201): ' . $response->getStatus());
+        $this->log('DataCite response status code (expected 201): ' . $response->getStatusCode());
         $this->log('DataCite response body: ' . $response->getBody());
 
-        if ($response->getStatus() != 201) {
-            $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
+        if ($response->getStatusCode() != 201) {
+            $message = 'unexpected DataCite MDS response code ' . $response->getStatusCode();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
@@ -181,16 +194,17 @@ class Client
         $response = null;
         $url = $this->serviceUrl . '/doi/' . $doiValue;
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new HttpClient($url);
             $client->setAuth($this->username, $this->password);
-            $response = $client->request(\Zend_Http_Client::GET);
+            $client->setMethod(Request::METHOD_GET);
+            $response = $client->send();
         } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
 
-        $statusCode = $response->getStatus();
+        $statusCode = $response->getStatusCode();
         // in $body steht die URL zur Frontdoor, die mit der DOI verknüpft wurde
         $body = $response->getBody();
 
@@ -209,8 +223,8 @@ class Client
      * in einer zukünftigen OPUS-Version ändert.
      *
      *
-     * @param $doiValue DOI für die die URL zur Landing-Page verändert werden soll
-     * @param $newUrl URL der Landing-Page
+     * @param string $doiValue DOI für die die URL zur Landing-Page verändert werden soll
+     * @param string $newUrl URL der Landing-Page
      *
      * @throws ClientException
      *
@@ -221,22 +235,26 @@ class Client
         $url = $this->serviceUrl . '/doi/' . $doiValue;
 
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new HttpClient($url);
             $client->setAuth($this->username, $this->password);
             $data = "doi=$doiValue\nurl=$newUrl";
-            $client->setRawData($data, 'text/plain;charset=UTF-8');
-            $response = $client->request(\Zend_Http_Client::PUT);
+            $client->setRawBody($data);
+            $client->setMethod(Request::METHOD_PUT);
+            $client->getRequest()->getHeaders()->addHeaders([
+                'Content-Type' => 'text/plain;charset=UTF-8'
+            ]);
+            $response = $client->send();
         } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
 
-        $this->log('DataCite response status code (expected 201): ' . $response->getStatus());
+        $this->log('DataCite response status code (expected 201): ' . $response->getStatusCode());
         $this->log('DataCite response body: ' . $response->getBody());
 
-        if ($response->getStatus() != 201) {
-            $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
+        if ($response->getStatusCode() != 201) {
+            $message = 'unexpected DataCite MDS response code ' . $response->getStatusCode();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
@@ -254,19 +272,20 @@ class Client
         $response = null;
         $url = $this->serviceUrl . '/metadata/' . $doiValue;
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new HttpClient($url);
             $client->setAuth($this->username, $this->password);
-            $response = $client->request(\Zend_Http_Client::DELETE);
+            $client->setMethod(Request::METHOD_DELETE);
+            $response = $client->send();
         } catch (\Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
 
-        $this->log('DataCite response status code (expected 200): ' . $response->getStatus());
+        $this->log('DataCite response status code (expected 200): ' . $response->getStatusCode());
 
-        if ($response->getStatus() != 200) {
-            $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
+        if ($response->getStatusCode() != 200) {
+            $message = 'unexpected DataCite MDS response code ' . $response->getStatusCode();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
