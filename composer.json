@@ -14,7 +14,8 @@
   },
   "require-dev": {
     "phpunit/phpunit": "6.5.14",
-    "laminas/laminas-coding-standard": "1.0.0"
+    "laminas/laminas-coding-standard": "1.0.0",
+    "phpmetrics/phpmetrics": "*"
 
   },
   "autoload": {
@@ -35,6 +36,7 @@
     "test": "phpunit --colors=always",
     "test-coverage": "phpunit --colors=always --coverage-clover build/clover.xml",
     "cs-check": "phpcs",
-    "cs-fix": "phpcbf"
+    "cs-fix": "phpcbf",
+    "metrics": "phpmetrics --report-html=build/metrics ."
   }
 }
