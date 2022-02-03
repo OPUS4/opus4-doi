@@ -1,5 +1,6 @@
 # ignore any third-party libraries
 vendor
+.vagrant
 
 # ignore composer runtime
 composer.phar
@@ -12,3 +13,6 @@ nbproject
 
 # Build files
 build
+
+# Other
+**/.DS_Store
