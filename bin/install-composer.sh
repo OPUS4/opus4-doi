@@ -17,7 +17,6 @@
 
 set -e
 
-SCRIPT_NAME="$(basename "$0")"
 SCRIPT_NAME_FULL="`readlink -f "$0"`"
 SCRIPT_PATH="`dirname "$SCRIPT_NAME_FULL"`"
 
