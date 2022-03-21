@@ -27,12 +27,14 @@
  *
  * @category    Application
  * @author      Sascha Szott <szott@zib.de>
- * @copyright   Copyright (c) 2018-2019, OPUS 4 development team
+ * @author      Jens Schwidder <schwidder@zib.de>
+ * @copyright   Copyright (c) 2018-2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Doi;
 
+use Laminas\Config\Config;
 use Opus\Doi\Client;
 use Opus\Doi\ClientException;
 use PHPUnit\Framework\TestCase;
@@ -48,7 +50,7 @@ class ClientTest extends TestCase
 
     public function testConstructorWithEmptyConfig()
     {
-        $config = new \Zend_Config([]);
+        $config = new Config([]);
 
         $exception = null;
         try {
@@ -61,7 +63,7 @@ class ClientTest extends TestCase
 
     public function testConstructorWithPartialConfig1()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -81,7 +83,7 @@ class ClientTest extends TestCase
 
     public function testConstructorWithPartialConfig2()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -103,7 +105,7 @@ class ClientTest extends TestCase
 
     public function testConstructorWithPartialConfig3()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -125,7 +127,7 @@ class ClientTest extends TestCase
 
     public function testConstructorWithFullConfig()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -149,7 +151,7 @@ class ClientTest extends TestCase
 
     public function testRegisterDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -162,7 +164,7 @@ class ClientTest extends TestCase
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $client->registerDoi(
             '10.5072/opustest-999',
             '',
@@ -176,7 +178,7 @@ class ClientTest extends TestCase
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -220,7 +222,7 @@ STRING;
 
     public function testCheckDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -233,7 +235,7 @@ STRING;
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $result = $client->checkDoi(
             '10.5072/opustest-999',
             'http://localhost/opus4/frontdoor/index/index/99'
@@ -247,7 +249,7 @@ STRING;
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -275,7 +277,7 @@ STRING;
 
     public function testUpdateUrlForDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -288,7 +290,7 @@ STRING;
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $client->updateUrlForDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
     }
 
@@ -298,7 +300,7 @@ STRING;
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -321,7 +323,7 @@ STRING;
 
     public function testDeleteMetadataForDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
@@ -334,7 +336,7 @@ STRING;
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $client->deleteMetadataForDoi('10.5072/opustest-999');
     }
 
@@ -344,7 +346,7 @@ STRING;
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
