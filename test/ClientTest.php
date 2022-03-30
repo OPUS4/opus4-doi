@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -25,9 +26,7 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Application
- * @author      Sascha Szott <szott@zib.de>
- * @copyright   Copyright (c) 2018-2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2018-2022, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -162,7 +161,7 @@ class ClientTest extends TestCase
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $client->registerDoi(
             '10.5072/opustest-999',
             '',
@@ -233,7 +232,7 @@ STRING;
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $result = $client->checkDoi(
             '10.5072/opustest-999',
             'http://localhost/opus4/frontdoor/index/index/99'
@@ -288,7 +287,7 @@ STRING;
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $client->updateUrlForDoi('10.5072/opustest-999', 'http://localhost/opus5/frontdoor/index/index/999');
     }
 
@@ -334,7 +333,7 @@ STRING;
         ]);
 
         $client = new Client($config);
-        $this->setExpectedException('Opus\Doi\ClientException');
+        $this->expectException(ClientException::class);
         $client->deleteMetadataForDoi('10.5072/opustest-999');
     }
 
