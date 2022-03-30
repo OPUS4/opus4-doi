@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -25,17 +26,19 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Application
- * @author      Sascha Szott <szott@zib.de>
- * @copyright   Copyright (c) 2018-2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2018-2022, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Doi;
 
+use Exception;
+use Zend_Config;
+use Zend_Http_Client;
+use Zend_Log;
+
 class Client
 {
-
     private $username;
 
     private $password;
@@ -45,33 +48,36 @@ class Client
     private $log;
 
     /**
-     * Client constructor.
-     *
-     * @param $config \Zend_Config
-     * @param $log \Zend_Log (optional)
-     *
+     * @param Zend_Config   $config
+     * @param Zend_Log|null $log
      * @throws ClientException
      */
     public function __construct($config, $log = null)
     {
-        if (isset($config->doi->registration->datacite->username)
-            && $config->doi->registration->datacite->username != '') {
+        if (
+            isset($config->doi->registration->datacite->username)
+            && $config->doi->registration->datacite->username !== ''
+        ) {
             $this->username = $config->doi->registration->datacite->username;
         }
-        if (isset($config->doi->registration->datacite->password)
-            && $config->doi->registration->datacite->password != '') {
+        if (
+            isset($config->doi->registration->datacite->password)
+            && $config->doi->registration->datacite->password !== ''
+        ) {
             $this->password = $config->doi->registration->datacite->password;
         }
-        if (isset($config->doi->registration->datacite->serviceUrl)
-            && $config->doi->registration->datacite->serviceUrl != '') {
+        if (
+            isset($config->doi->registration->datacite->serviceUrl)
+            && $config->doi->registration->datacite->serviceUrl !== ''
+        ) {
             $this->serviceUrl = $config->doi->registration->datacite->serviceUrl;
         }
 
-        if (! is_null($log)) {
+        if ($log !== null) {
             $this->log = $log;
         }
 
-        if (is_null($this->username) || is_null($this->password) || is_null($this->serviceUrl)) {
+        if ($this->username === null || $this->password === null || $this->serviceUrl === null) {
             $message = 'missing configuration settings to properly initialize DOI client';
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -82,25 +88,23 @@ class Client
      * Registriert die übergebene DOI und weist ihr die Metadaten zu, die im übergebenen XML stehen.
      * Achtung: Es kann bis zu 24-72h dauern bis die DOI im Handle-System sichtbar und auflösbar ist.
      *
-     * @param $doiValue
-     * @param $xmlStr
-     * @param $landingPageUrl
-     *
+     * @param string $doiValue
+     * @param string $xmlStr
+     * @param string $landingPageUrl
      * @throws ClientException
      */
     public function registerDoi($doiValue, $xmlStr, $landingPageUrl)
     {
-
         // Schritt 1: Metadaten als XML registrieren
         $response = null;
-        $url = $this->serviceUrl . '/metadata';
+        $url      = $this->serviceUrl . '/metadata';
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
 
             $client->setRawData($xmlStr, 'application/xml;charset=UTF-8');
-            $response = $client->request(\Zend_Http_Client::POST);
-        } catch (\Exception $e) {
+            $response = $client->request(Zend_Http_Client::POST);
+        } catch (Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -116,7 +120,7 @@ class Client
         // 403 Forbidden: login problem, quota exceeded
         // 415 Wrong Content Type : Not including content type in the header.
 
-        if ($response->getStatus() != 201) {
+        if ($response->getStatus() !== 201) {
             $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -126,12 +130,12 @@ class Client
         // DOI und URL der Frontdoor des zugehörigen Dokuments übergeben
         $url = $this->serviceUrl . '/doi/' . $doiValue;
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
             $data = "doi=$doiValue\nurl=" . $landingPageUrl;
             $client->setRawData($data, 'text/plain;charset=UTF-8');
-            $response = $client->request(\Zend_Http_Client::PUT);
-        } catch (\Exception $e) {
+            $response = $client->request(Zend_Http_Client::PUT);
+        } catch (Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -147,7 +151,7 @@ class Client
         $this->log('DataCite response status code (expected 201): ' . $response->getStatus());
         $this->log('DataCite response body: ' . $response->getBody());
 
-        if ($response->getStatus() != 201) {
+        if ($response->getStatus() !== 201) {
             $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -168,23 +172,20 @@ class Client
      * 403 Login problem or dataset belongs to another party
      * 404 Not Found: DOI does not exist in our database (e.g. registration pending)
      *
-     * @param $doiValue
-     * @param $landingPageURL
-     *
+     * @param string $doiValue
+     * @param string $landingPageUrl
      * @return bool Methode liefert true, wenn die DOI erfolgreich registiert wurde und die Prüfung positiv ausfällt.
-     *
      * @throws ClientException
-     *
      */
-    public function checkDoi($doiValue, $landingPageURL)
+    public function checkDoi($doiValue, $landingPageUrl)
     {
         $response = null;
-        $url = $this->serviceUrl . '/doi/' . $doiValue;
+        $url      = $this->serviceUrl . '/doi/' . $doiValue;
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
-            $response = $client->request(\Zend_Http_Client::GET);
-        } catch (\Exception $e) {
+            $response = $client->request(Zend_Http_Client::GET);
+        } catch (Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -195,9 +196,9 @@ class Client
         $body = $response->getBody();
 
         $this->log('DataCite response status code (expected 200): ' . $statusCode);
-        $this->log('DataCite response body (expected ' . $landingPageURL . '): ' . $body);
+        $this->log('DataCite response body (expected ' . $landingPageUrl . '): ' . $body);
 
-        return ($statusCode == 200 && $landingPageURL == $body);
+        return $statusCode === 200 && $landingPageUrl === $body;
     }
 
     /**
@@ -208,25 +209,22 @@ class Client
      * die Domain der OPUS-Instanz ändert oder wenn sich die Konstruktion von Frontdoor-URLs (Pfadbestandteile)
      * in einer zukünftigen OPUS-Version ändert.
      *
-     *
-     * @param $doiValue DOI für die die URL zur Landing-Page verändert werden soll
-     * @param $newUrl URL der Landing-Page
-     *
+     * @param string $doiValue DOI für die die URL zur Landing-Page verändert werden soll
+     * @param string $newUrl URL der Landing-Page
      * @throws ClientException
-     *
      */
     public function updateUrlForDoi($doiValue, $newUrl)
     {
         $response = null;
-        $url = $this->serviceUrl . '/doi/' . $doiValue;
+        $url      = $this->serviceUrl . '/doi/' . $doiValue;
 
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
             $data = "doi=$doiValue\nurl=$newUrl";
             $client->setRawData($data, 'text/plain;charset=UTF-8');
-            $response = $client->request(\Zend_Http_Client::PUT);
-        } catch (\Exception $e) {
+            $response = $client->request(Zend_Http_Client::PUT);
+        } catch (Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -235,7 +233,7 @@ class Client
         $this->log('DataCite response status code (expected 201): ' . $response->getStatus());
         $this->log('DataCite response body: ' . $response->getBody());
 
-        if ($response->getStatus() != 201) {
+        if ($response->getStatus() !== 201) {
             $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -245,19 +243,18 @@ class Client
     /**
      * Markiert den Datensatz zur übergebenen DOI als inaktiv.
      *
-     * @param $doiValue
-     *
+     * @param string $doiValue
      * @throws ClientException
      */
     public function deleteMetadataForDoi($doiValue)
     {
         $response = null;
-        $url = $this->serviceUrl . '/metadata/' . $doiValue;
+        $url      = $this->serviceUrl . '/metadata/' . $doiValue;
         try {
-            $client = new \Zend_Http_Client($url);
+            $client = new Zend_Http_Client($url);
             $client->setAuth($this->username, $this->password);
-            $response = $client->request(\Zend_Http_Client::DELETE);
-        } catch (\Exception $e) {
+            $response = $client->request(Zend_Http_Client::DELETE);
+        } catch (Exception $e) {
             $message = 'request to ' . $url . ' failed with ' . $e->getMessage();
             $this->log($message, 'err');
             throw new ClientException($message);
@@ -265,16 +262,20 @@ class Client
 
         $this->log('DataCite response status code (expected 200): ' . $response->getStatus());
 
-        if ($response->getStatus() != 200) {
+        if ($response->getStatus() !== 200) {
             $message = 'unexpected DataCite MDS response code ' . $response->getStatus();
             $this->log($message, 'err');
             throw new ClientException($message);
         }
     }
 
+    /**
+     * @param string $message
+     * @param string $level
+     */
     private function log($message, $level = 'debug')
     {
-        if (is_null($this->log)) {
+        if ($this->log === null) {
             return; // do not log anything
         }
         $this->log->$level($message);

@@ -32,27 +32,30 @@
 
 namespace OpusTest\Doi;
 
+use Exception;
 use Opus\Doi\Client;
 use Opus\Doi\ClientException;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
+
+use function get_class;
 
 class ClientTest extends TestCase
 {
+    protected const DATACITE_USERNAME = 'test';
 
-    const DATACITE_USERNAME = 'test';
+    protected const DATACITE_PASSWORD = 'secret';
 
-    const DATACITE_PASSWORD = 'secret';
-
-    const SAMPLE_IP_ADDRESS = '192.0.2.1';
+    protected const SAMPLE_IP_ADDRESS = '192.0.2.1';
 
     public function testConstructorWithEmptyConfig()
     {
-        $config = new \Zend_Config([]);
+        $config = new Zend_Config([]);
 
         $exception = null;
         try {
             new Client($config);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
@@ -60,19 +63,20 @@ class ClientTest extends TestCase
 
     public function testConstructorWithPartialConfig1()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe']
-                ]
-            ]
+                        'username' => 'doe',
+                    ],
+                ],
+            ],
         ]);
 
         $exception = null;
         try {
             new Client($config);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
@@ -80,21 +84,21 @@ class ClientTest extends TestCase
 
     public function testConstructorWithPartialConfig2()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
                         'username' => 'doe',
-                        'password' => 'secret'
-                    ]
-                ]
-            ]
+                        'password' => 'secret',
+                    ],
+                ],
+            ],
         ]);
 
         $exception = null;
         try {
             new Client($config);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
@@ -102,21 +106,21 @@ class ClientTest extends TestCase
 
     public function testConstructorWithPartialConfig3()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe',
-                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
-                    ]
-                ]
-            ]
+                        'username'   => 'doe',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS,
+                    ],
+                ],
+            ],
         ]);
 
         $exception = null;
         try {
             new Client($config);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = $e;
         }
         $this->assertTrue($exception instanceof ClientException, get_class($exception));
@@ -124,22 +128,22 @@ class ClientTest extends TestCase
 
     public function testConstructorWithFullConfig()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe',
-                        'password' => 'secret',
-                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
-                    ]
-                ]
-            ]
+                        'username'   => 'doe',
+                        'password'   => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS,
+                    ],
+                ],
+            ],
         ]);
 
         $exception = null;
         try {
             new Client($config);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exception = $e;
         }
 
@@ -148,16 +152,16 @@ class ClientTest extends TestCase
 
     public function testRegisterDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe',
-                        'password' => 'secret',
-                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
-                    ]
-                ]
-            ]
+                        'username'   => 'doe',
+                        'password'   => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS,
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -175,16 +179,16 @@ class ClientTest extends TestCase
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => self::DATACITE_USERNAME,
-                        'password' => self::DATACITE_PASSWORD,
-                        'serviceUrl' => 'https://mds.test.datacite.org'
-                    ]
-                ]
-            ]
+                        'username'   => self::DATACITE_USERNAME,
+                        'password'   => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org',
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -219,16 +223,16 @@ STRING;
 
     public function testCheckDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe',
-                        'password' => 'secret',
-                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
-                    ]
-                ]
-            ]
+                        'username'   => 'doe',
+                        'password'   => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS,
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -246,16 +250,16 @@ STRING;
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => self::DATACITE_USERNAME,
-                        'password' => self::DATACITE_PASSWORD,
-                        'serviceUrl' => 'https://mds.test.datacite.org'
-                    ]
-                ]
-            ]
+                        'username'   => self::DATACITE_USERNAME,
+                        'password'   => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org',
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -274,16 +278,16 @@ STRING;
 
     public function testUpdateUrlForDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe',
-                        'password' => 'secret',
-                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
-                    ]
-                ]
-            ]
+                        'username'   => 'doe',
+                        'password'   => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS,
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -297,16 +301,16 @@ STRING;
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => self::DATACITE_USERNAME,
-                        'password' => self::DATACITE_PASSWORD,
-                        'serviceUrl' => 'https://mds.test.datacite.org'
-                    ]
-                ]
-            ]
+                        'username'   => self::DATACITE_USERNAME,
+                        'password'   => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org',
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -320,16 +324,16 @@ STRING;
 
     public function testDeleteMetadataForDoi()
     {
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => 'doe',
-                        'password' => 'secret',
-                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS
-                    ]
-                ]
-            ]
+                        'username'   => 'doe',
+                        'password'   => 'secret',
+                        'serviceUrl' => 'http://' . self::SAMPLE_IP_ADDRESS,
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
@@ -343,16 +347,16 @@ STRING;
             'Test kann nur manuell gestartet werden (Zugangsdaten zum MDS-Testservice von DataCite erforderlich)'
         );
 
-        $config = new \Zend_Config([
+        $config = new Zend_Config([
             'doi' => [
                 'registration' => [
                     'datacite' => [
-                        'username' => self::DATACITE_USERNAME,
-                        'password' => self::DATACITE_PASSWORD,
-                        'serviceUrl' => 'https://mds.test.datacite.org'
-                    ]
-                ]
-            ]
+                        'username'   => self::DATACITE_USERNAME,
+                        'password'   => self::DATACITE_PASSWORD,
+                        'serviceUrl' => 'https://mds.test.datacite.org',
+                    ],
+                ],
+            ],
         ]);
 
         $client = new Client($config);
