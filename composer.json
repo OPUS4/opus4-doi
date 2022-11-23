@@ -9,11 +9,11 @@
   ],
   "homepage": "http://www.opus-repository.org",
   "require": {
-    "zendframework/zendframework1": "1.12.*"
+    "shardj/zf1-future": "1.21.*"
   },
   "require-dev": {
-    "phpunit/phpunit": "6.*",
-    "laminas/laminas-coding-standard": "<2.3"
+    "phpunit/phpunit": "<9",
+    "opus4-repo/codesniffer": "dev-laminas"
   },
   "autoload": {
     "psr-4": {
@@ -34,5 +34,10 @@
     "test-coverage": "phpunit --colors=always --coverage-clover build/clover.xml",
     "cs-check": "phpcs",
     "cs-fix": "phpcbf"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
