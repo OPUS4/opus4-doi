@@ -17,3 +17,4 @@ build
 
 # Other
 **/.DS_Store
+.phpunit.result.cache
