@@ -9,7 +9,7 @@
   ],
   "homepage": "http://www.opus-repository.org",
   "require": {
-    "shardj/zf1-future": "1.21.*"
+    "opus4/zf1-future": "1.21.*"
   },
   "require-dev": {
     "phpunit/phpunit": "<9",
