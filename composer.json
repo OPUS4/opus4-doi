@@ -14,7 +14,7 @@
     "ext-curl": "*",
     "ext-mbstring": "*",
     "ext-zip": "*",
-    "opus4/zf1-future": "1.21.*"
+    "opus4/zf1-future": "1.25.*"
   },
   "require-dev": {
     "phpunit/phpunit": "10.5.*",

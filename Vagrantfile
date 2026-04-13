@@ -40,7 +40,7 @@ echo "'composer cs-fix' to automatically fix basic style problems"
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-22.04"
+  config.vm.box = "bento/ubuntu-24.04"
 
   config.vm.provision 'shell', inline: $software
   config.vm.provision 'shell', privileged: false, inline: $composer
